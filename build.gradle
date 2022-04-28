@@ -10,6 +10,8 @@ repositories {
 }
 
 dependencies {
+    implementation("io.quarkus:quarkus-resteasy-reactive-qute")
+    implementation 'io.quarkus:quarkus-mongodb-client'
     implementation enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}")
     implementation 'io.quarkus:quarkus-kotlin'
     implementation 'io.quarkus:quarkus-resteasy-reactive-jackson'
