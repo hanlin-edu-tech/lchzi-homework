@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>InsertUser</title>
+</head>
+<body>
+    <p>Welcome to the Insert System</p>
+    <form method="post" action = "/UserData/UserInsert">
+        <div>
+            <label>Account</label>
+            <input id = "newAcc" type="hidden" name="_method" value="put">
+        </div>
+        <div>
+            <label>Password</label>
+            <input id = "newPw" type="hidden" name="_method" value="put">
+        </div>
+        <input type="submit" value="submit">
+    </form>
+</body>
+</html>
