@@ -3,19 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <title>InsertUser</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script type="text/javascript">
+        function insertData(){
+            var newAcc =$('#newAcc').val();
+            var newPw =$('#newPw').val();
+            console.log("aaa")
+<!--            $.post("/UserData/UserInsert?newAcc="test"&newPw="pw", { newAcc: "newAcc", newPw: "newPw" } );-->
+            fetch("/UserData/UserInsert",
+            {
+            headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+            },
+            method: 'PUT',
+            body: JSON.stringify({ "newAcc": newAcc, "newPw": newPw})
+            })
+              .then(function(response) {
+                return response;
+              })
+              .then(function(myJson) {
+                console.log(myJson);
+
+              });
+        }
+
+        function gotoSearch(){
+            var newAcc =$('#newAcc').val();
+            var newPw =$('#newPw').val();
+            fetch("/UserData/Check",
+            {
+            headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+            },
+            method: 'POST',
+            body: JSON.stringify({ "newAcc": newAcc, "newPw": newPw})
+            })
+              .then(function(response) {
+                return response;
+              })
+              .then(function(myJson) {
+                console.log(myJson);
+
+              });
+        }
+    </script>
 </head>
 <body>
     <p>Welcome to the Insert System</p>
-    <form method="post" action = "/UserData/UserInsert">
-        <div>
-            <label>Account</label>
-            <input id = "newAcc" type="hidden" name="_method" value="put">
-        </div>
-        <div>
-            <label>Password</label>
-            <input id = "newPw" type="hidden" name="_method" value="put">
-        </div>
-        <input type="submit" value="submit">
-    </form>
+    <div>
+        <label>Account</label>
+        <input id = "newAcc" name="newAcc" type="text">
+    </div>
+    <div>
+        <label>Password</label>
+        <input id = "newPw" name="newPw" type="text">
+    </div>
+    <button type="submit" id = "sub_btn" name = "sub_btn" onclick="insertData()">Submit</button>
+    <button onclick="gotoSearch()" id="SearchPage">CHECK</button>
 </body>
 </html>

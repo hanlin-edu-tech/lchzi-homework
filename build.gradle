@@ -10,6 +10,7 @@ repositories {
 }
 
 dependencies {
+    implementation("com.squareup.okhttp3:okhttp:4.9.3")
     implementation("io.quarkus:quarkus-resteasy-reactive-qute")
     implementation 'io.quarkus:quarkus-mongodb-client'
     implementation enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}")

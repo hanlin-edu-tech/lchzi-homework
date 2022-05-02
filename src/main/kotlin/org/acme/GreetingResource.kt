@@ -4,10 +4,15 @@ import com.mongodb.MongoException
 import io.quarkus.qute.Template
 import io.quarkus.qute.TemplateInstance
 import org.bson.Document
+import org.jboss.resteasy.reactive.RestQuery
+import java.net.URI
+import java.util.*
 import javax.enterprise.context.ApplicationScoped
 import javax.inject.Inject
 import javax.ws.rs.*
 import javax.ws.rs.core.MediaType
+import javax.ws.rs.core.Response
+
 
 
 @ApplicationScoped
@@ -22,40 +27,59 @@ class HelloResource {
     }
 }
 
-@Path("/userData")
-class userDataPage{
+@Path("UserData")
+class userData(private  val kotlinService: KotlinService) {
+
     @Inject
     lateinit var InsertUser: Template
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    fun userInsert():TemplateInstance{
+
+    @GET()
+    @Produces(MediaType.TEXT_PLAIN)
+    fun printWorld(): TemplateInstance{
         return InsertUser.instance()
     }
-}
 
-@Path("/UserData")
-class userData(private  val kotlinService: KotlinService) {
     @Path("UserInsert")
     @PUT
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    fun UserInsert() {
+
+    fun UserInsert(body: Map<String, String>){
+
+        var Acc: String = body["newAcc"]!!
+        var Pw: String = body["newPw"]!!
         try {
-            kotlinService.InsertUser("Account", "Password")
+            kotlinService.insertUser(Acc, Pw)
+        } catch (e: MongoException) {
+            e.printStackTrace()
+        }
+//        return Response.seeOther(URI("https://www.google.com")).build()
+    }
+
+    @Path("Check")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @POST
+    fun searchID(body: Map<String, String>){
+        var acc: String = body["newAcc"]!!
+        var pw: String = body["newPw"]!!
+        try {
+            if (kotlinService.existsUser(acc, pw)){
+                println("have this account")
+            }else{
+                println("dont have this account")
+            }
         } catch (e: MongoException) {
             e.printStackTrace()
         }
     }
+//    @Path("/Search/{_id}")
+//    @Produces(MediaType.TEXT_PLAIN)
+//    @PUT
+//    fun searchID(@PathParam("_id") _id: Int): ArrayList<Document> {
+//        return kotlinService.SUser(_id)
+//    }
 }
 
-@Path("/Search/{_id}")
-class userid(private val kotlinService: KotlinService) {
-
-    @Produces(MediaType.TEXT_PLAIN)
-    @GET
-    fun searchID(@PathParam("_id") _id: Int): ArrayList<Document> {
-        return kotlinService.SUser(_id)
-    }
-}
 
 
 
