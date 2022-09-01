@@ -25,7 +25,7 @@ nb-configuration.xml
 .DS_Store
 
 # Vim
-*.swp
+*.sap
 *.swo
 
 # patch
@@ -34,3 +34,5 @@ nb-configuration.xml
 
 # Local environment
 .env
+
+

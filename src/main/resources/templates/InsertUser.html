@@ -9,7 +9,6 @@
             var newAcc =$('#newAcc').val();
             var newPw =$('#newPw').val();
             console.log("aaa")
-<!--            $.post("/UserData/UserInsert?newAcc="test"&newPw="pw", { newAcc: "newAcc", newPw: "newPw" } );-->
             fetch("/UserData/UserInsert",
             {
             headers: {
@@ -31,22 +30,28 @@
         function gotoSearch(){
             var newAcc =$('#newAcc').val();
             var newPw =$('#newPw').val();
-            fetch("/UserData/Check",
-            {
-            headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
-            },
-            method: 'POST',
-            body: JSON.stringify({ "newAcc": newAcc, "newPw": newPw})
-            })
+              fetch("/UserData/Check?"+ new URLSearchParams({
+                Account: newAcc,
+                password:newPw}))
               .then(function(response) {
-                return response;
-              })
-              .then(function(myJson) {
-                console.log(myJson);
+                console.log(response)
+                if(response.status === 200){
+                    return response.text();
+                }
+              }).then(function(response) {
+                if (response === "Susscess"){
+                    let link = "/UserProfile?"
+                    var searchParams = new URLSearchParams([
+                    ['Account', newAcc],
+                    ['Password', newPw],
+                    ]);
 
-              });
+                    link = link+searchParams
+                    window.location.href = link
+                }else {
+                    document.getElementById("alert_msg").innerHTML = response
+                }
+              })
         }
     </script>
 </head>
@@ -62,5 +67,8 @@
     </div>
     <button type="submit" id = "sub_btn" name = "sub_btn" onclick="insertData()">Submit</button>
     <button onclick="gotoSearch()" id="SearchPage">CHECK</button>
+    <div>
+        <p id="alert_msg" >{alert_msg}</p>
+    </div>
 </body>
 </html>

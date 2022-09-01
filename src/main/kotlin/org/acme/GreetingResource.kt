@@ -1,156 +1,70 @@
 package org.acme
 
 import com.mongodb.MongoException
+import io.quarkus.qute.Location
 import io.quarkus.qute.Template
 import io.quarkus.qute.TemplateInstance
-import org.bson.Document
-import java.util.*
-import javax.enterprise.context.ApplicationScoped
 import javax.inject.Inject
 import javax.ws.rs.*
 import javax.ws.rs.core.MediaType
+import javax.ws.rs.core.Response
 
-@ApplicationScoped
+
 @Path("UserData")
-class userData(private  val kotlinService: KotlinService) {
-
+class UserData(private  val userservice: UserSevice) {
     @Inject
     lateinit var InsertUser: Template
-    @GET()
+    @GET
     @Produces(MediaType.TEXT_PLAIN)
-    fun loginPage(): TemplateInstance{
-        return InsertUser.instance()
+    fun loginPage(@QueryParam("Status") name: String?): TemplateInstance{
+        return InsertUser.data("alert_msg", name)
     }
 
     @Path("UserInsert")
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-
     fun userInsert(body: Map<String, String>){
-
         var acc: String = body["newAcc"]!!
         var pw: String = body["newPw"]!!
         try {
-            kotlinService.insertUser(acc, pw)
+            userservice.insertUser(acc, pw)
         } catch (e: MongoException) {
             e.printStackTrace()
         }
     }
 
     @Path("Check")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @POST
-    fun searchID(body: Map<String, String>){
-        var acc: String = body["newAcc"]!!
-        var pw: String = body["newPw"]!!
-        try {
-            if (kotlinService.existsUser(acc, pw)){
-                println("have this account")
+    @GET
+    fun searchID(@QueryParam("Account") account: String, @QueryParam("Password") password: String):Response{
+        var acc: String = account
+        var pw: String = password
+        return try {
+            if (userservice.existsUser(acc, pw)){
+               Response.ok("Susscess").build()
             }else{
-                println("dont have this account")
+                println("bad")
+                Response.ok("Account didnt find").build()
             }
         } catch (e: MongoException) {
             e.printStackTrace()
+            Response.serverError().build()
         }
     }
 }
 
 @Path("/UserProfile")
-class ProfileData(private  val kotlinService: KotlinService) {
-    @Path("ProfileData")
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    fun profileDataSearch(): ArrayList<Document> {
-        return kotlinService.searchProfileData(1)
-    }
+class ProfileData(private  val userprofileservice: UserProfileService, private val userservice: UserSevice) {
 
-    @Path("UpdatePro")
-    @PUT
-    @Produces(MediaType.APPLICATION_JSON)
-    fun updataProfile(){
-        try {
-            kotlinService.updateProfileData(1, 10000)
-        }catch (e: MongoException){
-            e.printStackTrace()
-        }
+
+    @Location("UserProfile")
+    lateinit var userprofile: Template
+    @GET
+    fun profileDataSearch(@QueryParam("Account") account: String, @QueryParam("Password") password: String): TemplateInstance {
+        var userid = userservice.getUserId(account, password)
+        var userprofiledata = userprofileservice.searchProfileData(userid)
+
+        return userprofile.data("Account","d", "Credit", "232")
     }
 }
-
-
-
-
-//    @Path("/Search/{_id}")
-//    @Produces(MediaType.TEXT_PLAIN)
-//    @PUT
-//    fun searchID(@PathParam("_id") _id: Int): ArrayList<Document> {
-//        return kotlinService.SUser(_id)
-//    }
-
-//@Path("/UserData")
-//class userData(private  val kotlinService: KotlinService){
-//    @Path("UserInsert")
-//    @PUT
-//    @Produces(MediaType.APPLICATION_JSON)
-//    fun UserInsert() {
-//        try {
-//            kotlinService.InsertUser("Account", "Password")
-//        }catch (e: MongoException){
-//            e.printStackTrace()
-//        }
-//    }
-//    @Path("UserSearch/")
-//    @Produces(MediaType.TEXT_PLAIN)
-//    @GET
-//    fun searchID(@PathParam("_id") _id: Int): ArrayList<Document> {
-//        return kotlinService.SUser(_id)
-//    }
-//}
-
-
-
-//@Path("warm/up")
-//class GradlePractice{
-//    @GET
-//    @Produces(MediaType.TEXT_PLAIN)
-//    fun printWorld() = "My first quarkus application."
-//}
-
-
-//@Path("mongotest/")
-//class MongoTest(private val kotlinService: KotlinService) {
-//    @POST
-//    @Consumes(MediaType.APPLICATION_JSON)
-//    @Produces(MediaType.TEXT_PLAIN)
-////    @GET
-////    @Produces(MediaType.TEXT_PLAIN)
-//    fun test(): Int {
-//        return kotlinService.findAll()
-//    }
-//
-//    @Path("Profile")
-//    @GET
-//    @Produces(MediaType.TEXT_PLAIN)
-//    fun SUserPro(): ArrayList<Document> {
-//        return kotlinService.SUserPro()
-//    }
-//}
-//
-//@Path("/hello2")
-//class HelloTest {
-//    @GET()
-//    @Produces(MediaType.TEXT_PLAIN)
-//    fun printWorld() = "My first quarkus application."
-//}
-//
-//@Path("/hello")
-//class HelloResource {
-//    @Inject
-//    lateinit var mongoData: Template
-//    @GET()
-//    @Produces(MediaType.TEXT_PLAIN)
-//    fun printWorld(): TemplateInstance{
-//        return mongoData.data("name", "I AM here")
-//    }
-//}
 
